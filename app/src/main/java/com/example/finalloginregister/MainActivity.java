@@ -45,10 +45,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
         Button login = findViewById(R.id.loginBttn);
         TextView register = findViewById(R.id.registerBttn);
         EditText emailLogin = findViewById(R.id.userName);
@@ -63,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
 
                 db.collection("users")
                         .whereEqualTo("email", emailInput)
-                        //.whereEqualTo("email", emailLogin)
                     .get().addOnSuccessListener(queryDocumentSnapshots -> {
                        if(!queryDocumentSnapshots.isEmpty()){
                           DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
@@ -74,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
                              // User logged in successfully
                              Toast.makeText(MainActivity.this, "Welcome!"
                                      ,Toast.LENGTH_SHORT).show();
+                             Intent intent = new Intent(getApplication(), InsideActivity.class);
+                             startActivity(intent);
                           }
 
                           else {
@@ -98,18 +95,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
 
-                // Check network connectivity
-                if (!isOnline()) {
-                    login.setEnabled(isConnected);
-                    register.setEnabled(isConnected);
-                    Toast.makeText(MainActivity.this, "Connect to internet first", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    login.setEnabled(true);
-                    register.setEnabled(true);
-                    Intent intent = new Intent(getApplication(), InsideActivity.class);
-                    startActivity(intent);
-                }
                 }
             });
 
@@ -122,11 +107,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    private boolean isOnline() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return (networkInfo != null && networkInfo.isConnected());
     }
 }
